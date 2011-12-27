@@ -4,4 +4,4 @@ srcdir=`dirname $0`
 autoreconf --force --install ${ACLOCAL_FLAGS};
 )
 
-${srcdir}/configure $@
+${srcdir}/configure "$@"
