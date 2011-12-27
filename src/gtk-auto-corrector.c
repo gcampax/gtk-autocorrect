@@ -57,16 +57,18 @@ gtk_auto_corrector_apply_autocorrection (GtkAutoCorrector *self)
 static void
 gtk_auto_corrector_commit_word (GtkAutoCorrector *self)
 {
+
   if (self->preediting)
     {
       self->preediting = FALSE;
 
-      g_signal_emit_by_name (self, "preedit-end", 0);
+      g_signal_emit_by_name (self, "preedit-end");
     }
 
-  g_signal_emit_by_name (self, "commit", 0, self->current_word->str);
+  g_signal_emit_by_name (self, "commit", self->current_word->str);
 
   g_string_truncate (self->current_word, 0);
+  g_signal_emit_by_name (self, "preedit-changed");
 }
 
 static void
@@ -93,11 +95,11 @@ gtk_auto_corrector_simple_commit_cb (GtkIMContext *context,
         {
           self->preediting = TRUE;
 
-          g_signal_emit_by_name (self, "preedit-start", 0);
+          g_signal_emit_by_name (self, "preedit-start");
         }
 
       g_string_append (self->current_word, str);
-      g_signal_emit_by_name (self, "preedit-changed", 0);
+      g_signal_emit_by_name (self, "preedit-changed");
     }
 }
 
@@ -107,7 +109,7 @@ gtk_auto_corrector_simple_preedit_changed_cb (GtkIMContext *context,
 {
   GtkAutoCorrector *self = user_data;
 
-  g_signal_emit_by_name (self, "preeedit-changed", 0);
+  g_signal_emit_by_name (self, "preeedit-changed");
 }
 
 static void
@@ -120,14 +122,14 @@ gtk_auto_corrector_simple_preedit_start_cb (GtkIMContext *context,
     {
       self->preediting = TRUE;
 
-      g_signal_emit_by_name (self, "preedit-start", 0);
+      g_signal_emit_by_name (self, "preedit-start");
     }
 }
 
 static void
 gtk_auto_corrector_init (GtkAutoCorrector *self)
 {
-  self->current_word = NULL;
+  self->current_word = g_string_new (NULL);
 
   self->simple_context = GTK_IM_CONTEXT (gtk_im_context_simple_new ());
   g_signal_connect (self->simple_context, "commit",
