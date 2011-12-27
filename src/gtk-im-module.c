@@ -35,23 +35,26 @@
 
 void im_module_init(GTypeModule *module);
 void im_module_exit(void);
-void im_module_list(GtkIMContextInfo **contexts, int *n_contexts);
+void im_module_list(GtkIMContextInfo ***contexts, int *n_contexts);
 GtkIMContext *im_module_create(gchar *context_id);
 
-GtkIMContextInfo info_list[] = {
-  { "auto-corrector",
-    "Automatic correction",
-    "gtk-auto-corrector",
-    "/usr/share/foo", /* FIXME */
-    "*"
-  }
+GtkIMContextInfo module_info = {
+  "auto-corrector",
+  "Automatic correction",
+  "gtk-auto-corrector",
+  "/usr/share/foo", /* FIXME */
+  "*"
+};
+
+GtkIMContextInfo *info_list[] = {
+  &module_info
 };
 
 void
-im_module_list (GtkIMContextInfo **contexts, int *n_contexts)
+im_module_list (GtkIMContextInfo ***contexts, int *n_contexts)
 {
   *contexts = info_list;
-  *n_contexts = G_N_ELEMENTS (info_list);
+  *n_contexts = G_N_ELEMENTS(info_list);
 }
 
 void
