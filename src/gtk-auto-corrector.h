@@ -19,15 +19,11 @@
  *
  */
 
-/* inclusion guard */
 #ifndef __GTK_AUTO_CORRECTOR_H__
 #define __GTK_AUTO_CORRECTOR_H__
 
 #include <glib-object.h>
 
-/*
- * Type macros.
- */
 #define GTK_TYPE_AUTO_CORRECTOR                  (gtk_auto_corrector_get_type ())
 #define GTK_AUTO_CORRECTOR(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_AUTO_CORRECTOR, GtkAutoCorrector))
 #define GTK_IS_AUTO_CORRECTOR(obj)               (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_AUTO_CORRECTOR))

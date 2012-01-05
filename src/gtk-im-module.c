@@ -32,6 +32,7 @@
 #include <gtk/gtkimmodule.h>
 
 #include "gtk-auto-corrector.h"
+#include "gtk-correction-store.h"
 
 void im_module_init(GTypeModule *module);
 void im_module_exit(void);
@@ -61,6 +62,7 @@ void
 im_module_init (GTypeModule *module)
 {
   _gtk_auto_corrector_register_type (module);
+  _gtk_correction_store_register_type (module);
 }
 
 void
