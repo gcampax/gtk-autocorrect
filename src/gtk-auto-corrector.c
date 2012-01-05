@@ -30,6 +30,7 @@
 #include <gtk/gtk.h>
 
 #include "gtk-auto-corrector.h"
+#include "gtk-correction-store.h"
 
 struct _GtkAutoCorrector
 {
@@ -39,6 +40,8 @@ struct _GtkAutoCorrector
 
   GtkIMContext *simple_context;
   GString      *current_word;
+
+  GtkCorrectionStore *correction_store;
 };
 
 struct _GtkAutoCorrectorClass
@@ -51,7 +54,16 @@ G_DEFINE_DYNAMIC_TYPE(GtkAutoCorrector, gtk_auto_corrector, GTK_TYPE_IM_CONTEXT)
 static void
 gtk_auto_corrector_apply_autocorrection (GtkAutoCorrector *self)
 {
-  /* FIXME: fill */
+  const gchar *word, *correction;
+
+  word = self->current_word->str;
+  correction = gtk_correction_store_get_correction (self->correction_store,
+                                                    word);
+
+  if (G_LIKELY (word == correction))
+    return;
+
+  g_string_assign (self->current_word, correction);
 }
 
 static void
@@ -139,6 +151,7 @@ gtk_auto_corrector_init (GtkAutoCorrector *self)
   g_signal_connect (self->simple_context, "preedit-start",
 		    G_CALLBACK (gtk_auto_corrector_simple_preedit_start_cb), self);
 
+  self->correction_store = gtk_correction_store_new ();
 }
 
 static void

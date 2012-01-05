@@ -103,6 +103,8 @@ gtk_correction_store_load_database (GtkCorrectionStore *self)
 
   qsort (self->array->data, self->array->len, sizeof(Entry), entry_comparator);
 
+  g_debug ("Loaded %d corrections from %s", self->array->len, DATABASE_PATH);
+
   g_io_channel_unref (channel);
   return;
 
