@@ -89,8 +89,23 @@ gtk_correction_store_load_database (GtkCorrectionStore *self)
 
       /* separate the strings */
       correction = strchr(line, ' ');
+      if (!correction)
+        {
+          /* malformed line */
+          g_free (line);
+          continue;
+        }
+
       *correction = 0;
       correction++;
+
+      if (strlen(line) == 0 ||
+          strlen(correction) == 0)
+        {
+          /* malformed line */
+          g_free (line);
+          continue;
+        }
 
       entry.to_be_corrected = line;
       entry.to_correct = correction;
@@ -129,12 +144,18 @@ gtk_correction_store_get_correction (GtkCorrectionStore *self,
                                      const char *word)
 {
   Entry key = { (char*) word, NULL };
-  Entry* answer = bsearch(&key, self->array->data, self->array->len, sizeof(void*), entry_comparator);
+  Entry* answer = bsearch(&key, self->array->data, self->array->len, sizeof(Entry), entry_comparator);
 
   if (answer)
-    return answer->to_correct;
+    {
+      g_debug ("Correcting %s to %s", word, answer->to_correct);
+      return answer->to_correct;
+    }
   else
-    return word;
+    {
+      g_debug ("No correction found for %s", word);
+      return word;
+    }
 }
 
 static void
