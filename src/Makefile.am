@@ -20,3 +20,8 @@ install-exec-local:
 		(cd $(gtkmoduledir)/..; \
 		gtk-query-immodules-3.0 immodules/*.so > immodules.cache; ) \
 	fi;
+
+noinst_PROGRAMS = clapis
+clapis_CFLAGS = -Wall
+clapis_CPPFLAGS = $(GTK_CFLAGS)
+clapis_LDADD = $(GTK_LIBS)
