@@ -26,7 +26,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "gtk-correction-store.h"
 
@@ -68,31 +67,59 @@ entry_comparator(const void *p1, const void *p2)
   return strcmp(e1->to_be_corrected, e2->to_be_corrected);
 }
 
-void
-gtk_correction_store_init (GtkCorrectionStore *self)
+static void
+gtk_correction_store_load_database (GtkCorrectionStore *self)
 {
-  FILE*f_def;
+  GIOChannel *channel;
+  gchar *line, *correction;
+  gsize line_terminator;
+  GError *error = NULL;
 
-  self->array = g_array_new(FALSE, FALSE, sizeof(Entry));
+  channel = g_io_channel_new_file (DATABASE_PATH, "r", &error);
+  if (error)
+    goto error;
 
-  if((f_def=fopen(DATABASE_PATH, "r")))
+  while (g_io_channel_read_line (channel, &line, NULL, &line_terminator, &error) ==
+         G_IO_STATUS_NORMAL)
     {
       Entry entry;
 
-      fscanf(f_def,"%ms %ms", &entry.to_be_corrected, &entry.to_correct);
-      while(!feof(f_def))
-        {
-          g_array_append_val(self->array, entry);
+      /* kill the line terminator */
+      line[line_terminator] = 0;
 
-          fscanf(f_def,"%ms %ms", &entry.to_be_corrected, &entry.to_correct);
-        }
+      /* separate the strings */
+      correction = strchr(line, ' ');
+      *correction = 0;
+      correction++;
 
-      qsort(self->array->data, self->array->len, sizeof(Entry), entry_comparator);
+      entry.to_be_corrected = line;
+      entry.to_correct = correction;
+
+      g_array_append_val (self->array, entry);
     }
-  else
-    {
-      g_warning("Auto correction database not found: %m");
-    }
+
+  if (error)
+    goto error;
+
+  qsort (self->array->data, self->array->len, sizeof(Entry), entry_comparator);
+
+  g_io_channel_unref (channel);
+  return;
+
+error:
+  /* No warning for No such file or directory */
+  if (!g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+    g_warning ("Failed to load correction database: %s", error->message);
+  g_clear_error (&error);
+}
+
+void
+gtk_correction_store_init (GtkCorrectionStore *self)
+{
+
+  self->array = g_array_new(FALSE, FALSE, sizeof(Entry));
+
+  gtk_correction_store_load_database (self);
 }
 
 const char*
@@ -118,8 +145,9 @@ gtk_correction_store_finalize (GObject *object)
     {
       Entry *e = &g_array_index (self->array, Entry, i);
 
-      free(e->to_be_corrected);
-      free(e->to_correct);
+      g_free(e->to_be_corrected);
+      /* to_correct is a pointer into to_be_corrected,
+         so don't free that */
     }
   g_array_free (self->array, TRUE);
 
