@@ -45,6 +45,8 @@ struct _GtkCorrectionStoreClass {
   GObjectClass parent_class;
 };
 
+static GObject *global_instance;
+
 G_DEFINE_DYNAMIC_TYPE(GtkCorrectionStore, gtk_correction_store, G_TYPE_OBJECT)
 
 void
@@ -174,7 +176,25 @@ gtk_correction_store_finalize (GObject *object)
     }
   g_array_free (self->array, TRUE);
 
+  if (object == global_instance)
+    global_instance = NULL;
+
   G_OBJECT_CLASS (gtk_correction_store_parent_class)->finalize (object);
+}
+
+static GObject *
+gtk_correction_store_constructor (GType                  type,
+                                  guint                  n_construct_properties,
+                                  GObjectConstructParam *construct_properties)
+{
+  if (global_instance == NULL)
+    global_instance = G_OBJECT_CLASS (gtk_correction_store_parent_class)->constructor (type,
+                                                                                       n_construct_properties,
+                                                                                       construct_properties);
+  else
+    g_object_ref (global_instance);
+
+  return global_instance;
 }
 
 void
@@ -183,6 +203,7 @@ gtk_correction_store_class_init (GtkCorrectionStoreClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = gtk_correction_store_finalize;
+  object_class->constructor = gtk_correction_store_constructor;
 }
 
 void
