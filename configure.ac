@@ -13,5 +13,6 @@ PKG_CHECK_MODULES(GTK, [gobject-2.0 gtk+-3.0])
 
 AC_OUTPUT([
 	Makefile
+	data/Makefile
 	src/Makefile
 ])

@@ -29,7 +29,7 @@
 
 #include "gtk-correction-store.h"
 
-#define DATABASE_PATH DATADIR "/def.txt"
+#define DATABASE_PATH PKGDATADIR "/database.txt"
 
 typedef struct {
   char *to_be_corrected;

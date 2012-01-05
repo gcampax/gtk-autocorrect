@@ -13,7 +13,7 @@ libautocorrect_la_SOURCES = \
 	$(NULL)
 
 libautocorrect_la_CFLAGS = -Wall
-libautocorrect_la_CPPFLAGS = $(GTK_CFLAGS) -DDATADIR='"$(datadir)"'
+libautocorrect_la_CPPFLAGS = $(GTK_CFLAGS) -DPKGDATADIR='"$(pkgdatadir)"' -DG_LOG_DOMAIN='"GtkAutoCorrector"'
 libautocorrect_la_LIBADD = $(GTK_LIBS)
 libautocorrect_la_LDFLAGS = -module -avoid-version
 
